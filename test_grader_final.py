@@ -1,3 +1,5 @@
+# Based on Adrian Rosebrock's code and blog post here:
+# https://www.pyimagesearch.com/2016/10/03/bubble-sheet-multiple-choice-scanner-and-test-grader-using-omr-python-and-opencv/
 # USAGE
 # python test_grader_final.py --image images/10_perfect.jpeg
 
