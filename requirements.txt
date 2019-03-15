@@ -1,4 +1,5 @@
 numpy
+scipy
 argparse
 imutils
 opencv-python
