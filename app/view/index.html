@@ -1,0 +1,61 @@
+<html lang='en'>
+<head>
+    <meta charset='utf-8'>
+    <link rel='stylesheet' href='../static/style.css'>
+    <script src='../static/client.js'></script>
+</head>
+<body>
+<div>
+    <div class='center'>
+        <div class='title'>Quiz Grader</div>
+            <div class='parent'>
+                <div class='child'>
+                  <div style = "text-align: center; margin-left: 20%; margin-right: 0%">
+                      <div style = "display: inline-block; text-align: left;">
+                    <p>
+                        To learn more about how the grader works, check out my blog <a href="nike.com">post</a>.<br><br>   <!-- add link to medium post -->
+
+                        <b>Instructions:</b><br>
+                        1. Print the NCAA_quiz.pdf and 10_question_bubble_sheet.pdf found <a href="https://drive.google.com/drive/folders/1LNd6zfa6NMzDdkiiLvi0dhMguP57G-8w">here</a>.<br>
+                        2. Bubble in the answers.<br>
+                        3. Snap a photo of the quiz with your camera, and we'll use computer vision to grade it!<br>
+                        <br>
+                        A couple tips for getting the best results with the photo:
+                    </p>
+                        <ul>
+                          <li>Use a pen to fill in the bubbles (sharper contrast)</li>
+                          <li>The bubble sheet should take up the majority of the image, while still capturing the edges completely</li>
+                          <li>Use a plain background behind the piece of paper</li>
+                          <li>Turning on the flash can help reduce shadows and lighting variation</li>
+                        </ul>
+                  </div>
+                </div>
+                </div>
+            </div>
+        <div class='content'>
+            <div class='no-display'>
+                <input id='file-input'
+                       class='no-display'
+                       type='file'
+                       name='file'
+                       accept='image/*'
+                       onchange='showPicked(this)'>
+            </div>
+            <button class='choose-file-button' type='button' onclick='showPicker()'>Select Image</button>
+            <div class='upload-label'>
+                <label id='upload-label'>No file chosen</label>
+            </div>
+            <div>
+                <img id='image-picked' class='no-display' alt='Chosen Image' height='200'>
+            </div>
+            <div class='analyze'>
+                <button id='analyze-button' class='analyze-button' type='button' onclick='analyze()'>Analyze</button>
+            </div>
+            <div class='result-label'>
+                <label id='result-label'></label>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
