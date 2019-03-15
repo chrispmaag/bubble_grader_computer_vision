@@ -1,7 +1,7 @@
 numpy
 argparse
 imutils
-cv2
+opencv-python
 starlette
 uvicorn==0.3.32
 python-multipart
