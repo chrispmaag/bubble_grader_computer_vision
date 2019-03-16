@@ -1,5 +1,6 @@
 numpy
 scipy
+fastai
 argparse
 imutils
 opencv-python
