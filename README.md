@@ -1,7 +1,7 @@
 # Use Computer Vision to Test Your Friends’ NCAA Tournament Knowledge
 ## Grading a bubble quiz with Optical Mark Recognition
 
-![Bubble Grader Web App](images/sample_app_output.png "Bubble Grader Web App")
+![Bubble Grader Web App](images/sample_app_output_cropped.png "Bubble Grader Web App")
 
 You can try out the app at https://bubble-grader.onrender.com/.
 A Medium post summarizing the steps in this project can be found [here](https://medium.com/@chrispmaag/use-computer-vision-to-test-your-friends-ncaa-tournament-knowledge-46f7dc7b1ae).
