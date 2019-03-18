@@ -15,44 +15,14 @@ import sys
 import imutils
 import cv2
 import multipart
+import base64
 
-# export_file_url = 'https://www.dropbox.com/s/v6cuuvddq73d1e0/export.pkl?raw=1'
-# export_file_url = 'https://www.dropbox.com/s/6bgq8t6yextloqp/export.pkl?raw=1'
-# export_file_name = 'export.pkl'
-
-# classes = ['black', 'grizzly', 'teddys']
-# path variable is needed as it's used in the html variable below
+# path variable used by html variable
 path = Path(__file__).parent
 
 app = Starlette()
 app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_headers=['X-Requested-With', 'Content-Type'])
 app.mount('/static', StaticFiles(directory='app/static'))
-
-# I don't think I need either of these two async functions
-# async def download_file(url, dest):
-#     if dest.exists(): return
-#     async with aiohttp.ClientSession() as session:
-#         async with session.get(url) as response:
-#             data = await response.read()
-#             with open(dest, 'wb') as f: f.write(data)
-#
-# async def setup_learner():
-#     await download_file(export_file_url, path/export_file_name)
-#     try:
-#         learn = load_learner(path, export_file_name)
-#         return learn
-#     except RuntimeError as e:
-#         if len(e.args) > 0 and 'CPU-only machine' in e.args[0]:
-#             print(e)
-#             message = "\n\nThis model was trained with an old version of fastai and will not work in a CPU environment.\n\nPlease update the fastai library in your training environment and export your model again.\n\nSee instructions for 'Returning to work' at https://course.fast.ai."
-#             raise RuntimeError(message)
-#         else:
-#             raise
-#
-# loop = asyncio.get_event_loop()
-# tasks = [asyncio.ensure_future(setup_learner())]
-# learn = loop.run_until_complete(asyncio.gather(*tasks))[0]
-# loop.close()
 
 @app.route('/')
 def index(request):
@@ -63,24 +33,14 @@ def index(request):
 async def analyze(request):
     data = await request.form()
     img_bytes = await (data['file'].read())
-    #print(type(img_bytes))
-    # img is type <class 'fastai.vision.image.Image'>, which I'm guessing opencv doesn't except
-    # open_image is a function from the fastai library
-    #img = open_image(BytesIO(img_bytes))
-    # print('type img: ', type(img))
-    # i feel like this is where all of my code would go
-    # prediction = learn.predict(img)[0]
-    # BytesIO(img_bytes)
-    # THIS SEEMED TO WORK!!
+    # read image into opencv
     image = cv2.imdecode(np.fromstring(img_bytes, np.uint8), 1)
-    # image = cv2.imread(BytesIO(img_bytes))
-    # image = cv2.imread(img)
     image = imutils.resize(image, height = 850)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray, (5, 5), 0)
     edged = cv2.Canny(blurred, 75, 200)
-    # cv2.imshow("Image", edged)
 
+    # define the number of bubbles to look for and the answers to the quiz
     num_bubbles = 50
     ANSWER_KEY = {0: 2, 1: 0, 2: 4, 3: 0, 4: 1, 5: 4, 6: 3, 7: 3, 8: 3, 9: 2}
 
@@ -112,9 +72,7 @@ async def analyze(request):
     			docCnt = approx
     			break
 
-    # let's try adding red dots to the image where each of the four points are in the docCnt
     # to see if model is correctly finding the four corners of the page
-    # print("STEP 2: Check Corners of Contour")
     # output = image.copy()
     # cv2.circle(output, (docCnt[0][0][0], docCnt[0][0][1]) , 5, (0, 0, 255), -1)
     # cv2.circle(output, (docCnt[1][0][0], docCnt[1][0][1]) , 5, (0, 0, 255), -1)
@@ -128,17 +86,10 @@ async def analyze(request):
     paper = four_point_transform(image, docCnt.reshape(4, 2))
     warped = four_point_transform(gray, docCnt.reshape(4, 2))
 
-    # print("STEP 3: Examine warped output")
-    # cv2.imshow("Warped", warped)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-
+    # implement thresholding on transformed image
     thresh_gauss = cv2.adaptiveThreshold(warped, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,13,2)
     thresh_mean = cv2.adaptiveThreshold(warped, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY_INV,13,2)
     thresh_simple = cv2.threshold(warped, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-
-    # cv2.imshow("Thresh Simple", thresh_simple)
-    # cv2.waitKey(0)
 
     def generate_contours(threshold):
     	"""
@@ -180,11 +131,6 @@ async def analyze(request):
     questionCnts_mean = generate_question_contours(cnts_mean)
     questionCnts_simple = generate_question_contours(cnts_simple)
 
-    # print("STEP 4.5: Did we find {} bubbles?".format(num_bubbles))
-    # print('Gauss len: ', len(questionCnts_gauss))
-    # print('Mean len: ', len(questionCnts_mean))
-    # print('Simple len: ', len(questionCnts_simple))
-
     # Different thresholding techniques will sometimes result in a different
     # number of contours being found. I want to find 50 because I have 10 questions
     # with 5 bubbles each, so I'll pick a threshold that has bubble contour length of 50
@@ -198,8 +144,6 @@ async def analyze(request):
     	questionCnts = questionCnts_gauss
 
     # each question has 5 possible answers, to loop over the question in batches of 5
-    # print("STEP 5: Did we find {} bubbles after selecting a threshold?".format(num_bubbles), len(questionCnts))
-
     # sort the question contours top-to-bottom
     questionCnts = contours.sort_contours(questionCnts, method="top-to-bottom")[0]
     correct = 0
@@ -230,7 +174,6 @@ async def analyze(request):
     		total = cv2.countNonZero(mask)
 
     		# Uncomment to look at masks
-    		# print("STEP 6: Look at masks")
     		# cv2.imshow("Mask", mask)
     		# cv2.waitKey(0)
 
@@ -279,12 +222,20 @@ async def analyze(request):
     	cv2.FONT_HERSHEY_DUPLEX, 0.8, (0, 0, 0), 1)
     cv2.putText(paper, "{} bubbles".format(len(questionCnts)), (245, 30),
     	cv2.FONT_HERSHEY_DUPLEX, 0.8, (0, 0, 0), 1)
-    cv2.imshow("Original", image)
-    cv2.imshow("Exam", paper)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    # return JSONResponse({'result': "test"})
-    return JSONResponse({'result': "{:.0f}%".format(score)})
+
+    # Uncomment to see original and graded
+    # cv2.imshow("Original", image)
+    # cv2.imshow("Exam", paper)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+
+    # encode paper variable as a jpg
+    retval, buffer_img = cv2.imencode('.jpg', paper)
+    final = base64.b64encode(buffer_img)
+
+    # return JSONResponse({'result': "{:.0f}%".format(score)})
+    # Pass base64 encoded image 'final' to JSONResponse so client.js can eventually return the image in index.html
+    return JSONResponse({'result': "{:.0f}%".format(score), 'picture': "{}".format(final)})
 
 if __name__ == '__main__':
     if 'serve' in sys.argv: uvicorn.run(app=app, host='0.0.0.0', port=5042)
