@@ -24,7 +24,11 @@ function analyze() {
     xhr.onload = function(e) {
         if (this.readyState === 4) {
             var response = JSON.parse(e.target.responseText);
-            el('result-label').innerHTML = `Score: ${response['result']}`;
+            var test = `${response['picture']}`;
+            // need to remove the "b'" at the beginning of my base64 string that comes from Python and the "'" at the very end. I can then pass this as a string literal to setAttribute
+            var res = test.substring(2, test.length - 1);
+            // Set src of img to base64 image type, then pass in my res variable
+            document.getElementById('img').setAttribute('src', `data:image/png;base64, ${res}`);
         }
         el('analyze-button').innerHTML = 'Analyze';
     }
