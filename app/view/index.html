@@ -7,20 +7,20 @@
 <body>
 <div>
     <div class='center'>
-        <div class='title'>Quiz Grader</div>
+        <div class='title'>Bubble Grader</div>
             <div class='parent'>
                 <div class='child'>
                   <div style = "text-align: center; margin-left: 10%; margin-right: 0%">
                       <div style = "display: inline-block; text-align: left;">
                     <p>
-                        To learn more about how the grader works, check out my blog <a href="nike.com">post</a>.<br><br>   <!-- add link to medium post -->
+                        To learn more about how the grader works, check out my blog <a href="https://medium.com/@chrispmaag/use-computer-vision-to-test-your-friends-ncaa-tournament-knowledge-46f7dc7b1ae">post</a>.<br><br>
 
                         <b>Instructions:</b><br>
                         1. Print the NCAA_quiz.pdf and 10_question_bubble_sheet.pdf found <a href="https://drive.google.com/drive/folders/1LNd6zfa6NMzDdkiiLvi0dhMguP57G-8w">here</a>.<br>
                         2. Bubble in the answers.<br>
                         3. Snap a photo of the quiz with your camera, and we'll use computer vision to grade it!<br>
                         <br>
-                        A couple tips for getting the best results with the photo:
+                        Here are a few tips for getting the best results with the photo:
                     </p>
                         <ul>
                           <li>Use a pen to fill in the bubbles (sharper contrast)</li>
@@ -28,6 +28,12 @@
                           <li>Use a plain background behind the piece of paper</li>
                           <li>Turning on the flash can help reduce shadows and lighting variation</li>
                         </ul>
+                    <p>
+                        Made by Chris Pontarolo-Maag
+                        <a href="https://github.com/chrispmaag">
+                          <img class='github' src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" style="width:25px;height:25px;border:0;vertical-align:middle;">
+                        </a>
+                    </p>
                   </div>
                 </div>
                 </div>
@@ -51,8 +57,9 @@
             <div class='analyze'>
                 <button id='analyze-button' class='analyze-button' type='button' onclick='analyze()'>Analyze</button>
             </div>
-            <div class='result-label'>
-                <label id='result-label'></label>
+            <br>
+            <div>
+                <img id="img" src="">
             </div>
         </div>
     </div>
